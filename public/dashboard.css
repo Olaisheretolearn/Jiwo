@@ -1,0 +1,333 @@
+/* -------- Fonts -------- */
+
+@font-face {
+  font-family: "TheSeasons";
+  src: url("/fonts/Fontspring-DEMO-theseasons-reg.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* -------- Layout -------- */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Ovo", serif;
+  background: #f7f7f9;
+  color: #111;
+}
+
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+
+.sidebar {
+  width: 180px;
+  padding: 30px 20px;
+  border-right: 1px solid #ddd;
+  background: #ffffff;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin-bottom: 16px;
+}
+
+.sidebar a {
+  text-decoration: none;
+  color: #000;
+}
+
+/* Main content */
+
+.main-content {
+  flex: 1;
+  padding: 25px 60px 40px;
+}
+
+/* Top bar */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.top-left h2 {
+  margin: 0;
+  font-family: "TheSeasons", serif;
+}
+
+.search-form input {
+  width: 420px;
+  padding: 6px 10px;
+  border: 1px solid #000;
+}
+
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.app-name {
+  font-family: "TheSeasons", serif;
+}
+
+.start-session-btn {
+  border: none;
+  background: #3f4a6a;
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Sections */
+
+.section-block {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  margin: 0 0 6px;
+  font-family: "TheSeasons", serif;
+  font-size: 22px;
+}
+
+.section-subtitle {
+  margin: 0 0 18px;
+  font-size: 13px;
+  color: #555;
+}
+
+.section-empty {
+  font-size: 14px;
+  color: #777;
+}
+
+/* Card grid */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+/* Session cards */
+
+.session-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.session-card.small {
+  height: 160px;
+}
+
+.session-overlay {
+  position: absolute;
+  inset: 0;
+  padding: 14px 16px;
+  color: #fff;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.7),
+    rgba(0,0,0,0.15)
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.session-title {
+  margin: 0 0 4px;
+  font-family: "TheSeasons", serif;
+  font-size: 16px;
+}
+
+.session-meta {
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.meta-item {
+  margin-right: 10px;
+}
+
+.session-start {
+  font-size: 11px;
+  margin: 0 0 6px;
+}
+
+.session-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.btn {
+  padding: 6px 12px;
+  border-radius: 3px;
+  border: none;
+  background: #3f4a6a;
+  color: #fff;
+  font-size: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn.secondary {
+  background: #ffffff;
+  color: #3f4a6a;
+}
+
+/* LIVE pill */
+
+.live-pill {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 4px 10px;
+  background: #e53935;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+/* -------- Banner backgrounds -------- */
+
+
+
+.banner-ocean-1 {
+  background-image: url("/images/banner/ocean-1.jpg");
+}
+
+.banner-leaves {
+  background-image: url("/images/banner/leaf-1.jpg");
+}
+
+.banner-fern {
+  background-image: url("/images/banner/fern.jpg");
+}
+
+
+.banner-swan {
+  background-image: url("/images/banner/swan.jpg");
+}
+
+.banner-cloud {
+  background-image: url("/images/banner/cloud.jpg");
+}
+
+.banner-cash {
+  background-image: url("/images/banner/cash-1.jpg");
+}
+
+/* fallback if no specific banner key */
+.session-card:not([class*="banner-"]) {
+  background-image: url("/images/banner/ocean-1.jpg");
+}
+
+
+
+
+/* default card background */
+.session-card {
+  /* your grey gradient, padding, etc. */
+}
+
+/* ocean banner */
+.session-card.banner-ocean-1 {
+  background-image: url('/images/banner/ocean-1.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* cash banner */
+.session-card.banner-cash-1 {
+  background-image: url('/images/banner/cash-1.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* leaf banner */
+.session-card.banner-leaf-1 {
+  background-image: url('/images/banner/leaf-1.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* cloud banner */
+.session-card.banner-cloud-1 {
+  background-image: url('/images/banner/cloud-1.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* swan banner */
+.session-card.banner-swan {
+  background-image: url('/images/banner/swan.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* fern banner */
+.session-card.banner-fern {
+  background-image: url('/images/banner/fern.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.join-code-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.join-code-form input {
+  width: 150px;
+  padding: 4px 6px;
+  border: 1px solid #000;
+  font-size: 12px;
+}
+
+.join-code-form button {
+  padding: 4px 10px;
+  border: none;
+  background: #3f4a6a;
+  color: #fff;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.join-code-form input {
+  width: 140px;
+}
+
+

@@ -1,0 +1,301 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title #{session.classCode} – Host Session
+
+    link(rel="stylesheet", href="https://fonts.googleapis.com/css2?family=Ovo&display=swap")
+    link(rel="stylesheet", href="/host.css")
+
+  body
+    .app-container
+      aside.sidebar
+        nav
+          ul
+            li: a(href="/dashboard") Home
+            li: a(href="/downloads") Downloads
+
+      .main-content
+        header.top-bar
+          .top-left
+            h2 Hi #{username}
+          .top-center
+            form.search-form(action="/search" method="GET")
+              input(type="text" name="q" placeholder="Search")
+          .top-right
+            span.app-name Jiwo
+            .hamburger-menu
+              button(type="button" id="menuToggle") ☰
+              ul#menuDropdown.menu-dropdown
+                li
+                  form(action="/logout" method="POST")
+                    button(type="submit") Log out
+
+        // SESSION INFO BAR (toolbar)
+        .session-toolbar
+          .format-buttons
+            button(type="button" data-tag="h1") H1
+            button(type="button" data-tag="h2") H2
+            button(type="button" data-tag="b") B
+            button(type="button" data-tag="i") I
+            button(type="button" data-tag="u") U
+
+          .session-status
+            label.toggle
+              input(type="checkbox" id="liveToggle" checked=session.isLive)
+              span#liveLabel #{session.isLive ? 'Live' : 'Not live'}
+            span.viewer-count 👁️ #{session.viewerCount || 0}
+            span.clap-count 👏 #{session.clapCount || 0}
+            button#endSession(type="button") End Session
+
+
+          .share-strip
+            .share-code
+            span.share-label Class code:
+            span.code-pill #{session.classCode}
+          .share-link
+            span.share-label Session link:
+            input#sessionLink(type="text" readonly)
+            button#copyLink(type="button") Copy
+
+        // MAIN CONTENT + COMMENTS SIDEBAR
+        .host-layout
+          .note-editor
+            h1 #{session.classCode} – #{session.description}
+            form(action=`/sessions/${session._id}/note` method="POST")
+              textarea(name="noteText" rows="20")= session.noteText
+              button(type="submit") Save Notes
+
+          .comments-panel
+            h3 Live note Comments
+            .comments-list
+            if session.comments && session.comments.length
+              each c in session.comments
+                p.comment-line
+                  span.comment-time= c.createdAt.toLocaleString()
+                  |  – #{c.authorName}: #{c.text}
+            else
+              p No comments yet.
+
+            form(action=`/sessions/${session._id}/comments` method="POST")
+              input(type="text" name="text" placeholder="write a comment")
+              button(type="submit") Send
+
+    
+    script.
+      (function() {
+        const textarea = document.querySelector('.note-editor textarea');
+        const buttons = document.querySelectorAll('.format-buttons button');
+
+        // websocket for live notes (HOST) 
+        const sessionId = "#{session._id}";
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const wsUrl = `${wsProtocol}://${window.location.host}/ws/sessions/${sessionId}?role=host`;
+        const ws = new WebSocket(wsUrl);
+
+          ws.addEventListener('message', (event) => {
+          let data;
+          try {
+            data = JSON.parse(event.data);
+          } catch {
+            return;
+          }
+
+           if (data.type === 'newComment') {
+            appendComment(data.comment);
+          }
+
+          if (data.type === 'clapCount') {
+            const clapSpan = document.querySelector('.session-status .clap-count');
+            if (clapSpan) {
+              clapSpan.textContent = `👏 ${data.clapCount}`;
+            }
+          }
+
+          if (data.type === 'liveStatus') {
+            const liveLabel = document.getElementById('liveLabel');
+            if (liveLabel) {
+              liveLabel.textContent = data.isLive ? 'Live' : 'Not live';
+            }
+          }
+
+          // (noteUpdate messages are ignored on host, host already has text)
+        });
+
+
+        function debounce(fn, delay) {
+          let t;
+          return (...args) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn(...args), delay);
+          };
+        }
+
+        //append comment
+          function appendComment(comment) {
+          const list = document.querySelector('.comments-panel .comments-list');
+          if (!list) return;
+
+          const noComments = list.querySelector('.no-comments');
+          if (noComments) {
+            noComments.remove();
+          }
+
+          const p = document.createElement('p');
+          p.className = 'comment-line';
+
+          const timeSpan = document.createElement('span');
+          timeSpan.className = 'comment-time';
+          timeSpan.textContent = new Date(comment.createdAt).toLocaleString();
+
+          p.appendChild(timeSpan);
+          p.appendChild(document.createTextNode(` – ${comment.authorName}: ${comment.text}`));
+
+          list.appendChild(p);
+
+          // auto-scroll to bottom
+          const panel = document.querySelector('.comments-panel');
+          if (panel) {
+            panel.scrollTop = panel.scrollHeight;
+          }
+        }
+
+
+        const sendNoteUpdate = debounce(() => {
+          if (ws.readyState === WebSocket.OPEN && textarea) {
+            ws.send(JSON.stringify({
+              type: 'noteUpdate',
+              text: textarea.value
+            }));
+          }
+        }, 400);
+
+        if (textarea) {
+          textarea.addEventListener('input', sendNoteUpdate);
+        }
+
+    
+        const menuToggle = document.getElementById('menuToggle');
+        const menuDropdown = document.getElementById('menuDropdown');
+        if (menuToggle && menuDropdown) {
+          menuToggle.addEventListener('click', () => {
+            menuDropdown.classList.toggle('open');
+          });
+        }
+
+
+         // copy link and share link functionalite
+        const linkInput = document.getElementById('sessionLink');
+        const copyBtn = document.getElementById('copyLink');
+
+        if (linkInput) {
+          linkInput.value = `${window.location.origin}/sessions/${"#{session._id}"}`;
+        }
+
+        if (copyBtn && linkInput && navigator.clipboard) {
+          copyBtn.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(linkInput.value);
+              copyBtn.textContent = 'Copied!';
+              setTimeout(() => (copyBtn.textContent = 'Copy'), 1200);
+            } catch (e) {
+              console.error('Copy failed', e);
+              alert('Could not copy link, please copy manually.');
+            }
+          });
+        }
+
+                // ---- end session button ----
+        const endBtn = document.getElementById('endSession');
+        if (endBtn) {
+          endBtn.addEventListener('click', async () => {
+            const ok = confirm('End this session for all viewers?');
+            if (!ok) return;
+
+            try {
+              await fetch(window.location.pathname + '/end', {
+                method: 'POST'
+              });
+              // after ending, go back to dashboard
+              window.location.href = '/dashboard';
+            } catch (e) {
+              console.error('Error ending session:', e);
+              alert('Could not end session. Please try again.');
+            }
+          });
+        }
+
+
+        //  formatting buttons (Internet programming assignm,ent style)
+        function wrapSelection(prefix, suffix = prefix) {
+          if (!textarea) return;
+
+          const start = textarea.selectionStart;
+          const end = textarea.selectionEnd;
+          const value = textarea.value;
+          const selected = value.slice(start, end);
+
+          const newText =
+            value.slice(0, start) +
+            prefix +
+            selected +
+            suffix +
+            value.slice(end);
+
+          textarea.value = newText;
+          textarea.focus();
+          textarea.setSelectionRange(
+            start + prefix.length,
+            end + prefix.length
+          );
+        }
+
+        const map = {
+          h1: '# ',
+          h2: '## ',
+          b: '**',
+          i: '*',
+          u: '__'
+        };
+
+        buttons.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            if (!textarea) return;
+            const tag = btn.dataset.tag;
+
+            if (tag === 'h1' || tag === 'h2') {
+              const start = textarea.selectionStart;
+              const value = textarea.value;
+              const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+              const prefix = map[tag];
+              textarea.value =
+                value.slice(0, lineStart) + prefix + value.slice(lineStart);
+              textarea.focus();
+            } else if (tag === 'b' || tag === 'i' || tag === 'u') {
+              wrapSelection(map[tag]);
+            }
+          });
+        });
+
+        // ---- live / not live toggle ----
+        const liveToggle = document.getElementById('liveToggle');
+        const liveLabel = document.getElementById('liveLabel');
+
+        if (liveToggle && liveLabel) {
+          liveToggle.addEventListener('change', async () => {
+            const isLive = liveToggle.checked;
+            liveLabel.textContent = isLive ? 'Live' : 'Not live';
+
+            try {
+              await fetch(window.location.pathname + '/live', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isLive })
+              });
+            } catch (e) {
+              console.error('Error toggling live:', e);
+            }
+          });
+        }
+      })();

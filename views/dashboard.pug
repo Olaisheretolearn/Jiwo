@@ -1,0 +1,90 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Jiwo – Dashboard
+    link(href="https://fonts.googleapis.com/css2?family=Ovo&display=swap", rel="stylesheet")
+    link(href="/dashboard.css", rel="stylesheet")
+
+  body
+    .app-container
+      aside.sidebar
+        nav
+          ul
+            li: a(href="/dashboard") Home
+            li: a(href="/downloads") Downloads
+
+      // MAIN AREA
+      .main-content
+        header.top-bar
+          .top-left
+            h2 Hi #{username}
+
+          .top-center
+            form.search-form(action="/search" method="GET")
+              input(type="text" name="q" placeholder="Search")
+
+          .top-right
+            form.join-code-form(action="/sessions/join" method="GET")
+              input(type="text" name="code" placeholder="Enter class code" required)
+              button(type="submit") Join
+
+            span.app-name Jiwo
+
+            button.start-session-btn(type="button" onclick="window.location.href='/sessions/new'")
+              | Start a note session
+
+
+
+        // ACTIVE SESSIONS
+        section.section-block
+          h2.section-title Active Sessions
+          p.section-subtitle These are notes around the school that are live right now
+
+          if liveSessions && liveSessions.length
+            .card-grid
+              each s in liveSessions
+                .session-card(class=`banner-${s.bannerKey || 'ocean-1'}`)
+                  .session-overlay
+                    .session-top-row
+                      h3.session-title #{s.classCode} #{s.description}
+                    .session-meta
+                      span.meta-item 👁 #{s.viewerCount || 0} viewers
+                      span.meta-item 👏 #{s.clapCount || 0} claps
+                    p.session-start
+                      | Started: 
+                      if s.startedAt
+                        | #{s.startedAt.toLocaleTimeString()}
+                      else
+                        | –
+                    .session-actions
+                      a.btn(href=`/sessions/${s._id}`) Join Note
+                      a.btn.secondary(href="#") Buy them coffee
+                    span.live-pill LIVE
+          else
+            p.section-empty No sessions are live right now.
+
+        // EARLIER SESSIONS
+        section.section-block
+          h2.section-title Earlier Note Sessions
+          p.section-subtitle Notes will only last 24 hours after they were made
+
+          if recentSessions && recentSessions.length
+            .card-grid
+              each s in recentSessions
+                .session-card.small(class=`banner-${s.bannerKey || 'ocean-1'}`)
+                  .session-overlay
+                    h3.session-title #{s.classCode} #{s.description}
+                    .session-meta
+                      span.meta-item 👁 #{s.viewerCount || 0} views
+                      span.meta-item 👏 #{s.clapCount || 0} claps
+                    p.session-start
+                      if s.startedAt
+                        | Started: #{s.startedAt.toLocaleTimeString()}
+                      else
+                        | Started: –
+                    .session-actions
+                      a.btn(href=`/sessions/${s._id}`) Join Note
+          else
+            p.section-empty No earlier sessions yet.

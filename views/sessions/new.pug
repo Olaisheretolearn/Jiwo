@@ -1,0 +1,129 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Create Note Session – Jiwo
+    link(rel="stylesheet", href="https://fonts.googleapis.com/css2?family=Ovo&display=swap")
+    link(rel="stylesheet", href="/styles.css")
+
+  body
+    .app-container
+      // LEFT SIDEBAR NAV
+      aside.sidebar
+        nav
+          ul
+            li
+              a(href="/dashboard") Home
+            li
+              a(href="/downloads") Downloads
+            li
+              a(href="/dashboard") Starred Sessions
+            li
+              a(href="/dashboard") Live Sessions
+
+      // MAIN AREA
+      .main-content
+        // TOP BAR
+        header.top-bar
+          .top-left
+            h2 Hi #{username}
+          .top-center
+            form.search-form(action="/search" method="GET")
+              input(type="text" name="q" placeholder="Search")
+          .top-right
+            span.app-name Jiwo
+            // Hamburger with dropdown
+            .hamburger-menu
+              button(type="button" id="menuToggle") ☰
+              ul#menuDropdown.menu-dropdown
+                li
+                  a(href="/account") Account
+                li
+                  form(action="/logout" method="POST")
+                    button(type="submit") Log out
+
+        // MAIN CREATE SESSION SECTION
+        section.create-session
+          .create-left
+            h1 Create Note Session
+
+            form(action="/sessions" method="POST" enctype="multipart/form-data")
+              // Class code
+              label(for="classCode") Class code (Mandatory)
+              input(type="text" id="classCode" name="classCode" required)
+
+              // Description
+              label(for="description") Class Description ( e.g Accounting for Cartels)
+              input(type="text" id="description" name="description")
+
+              // Live typing toggle
+              .live-typing-row
+                span Enable live typing?
+                label
+                  input(type="radio" name="liveTyping" value="yes" checked)
+                  |  yes
+                label
+                  input(type="radio" name="liveTyping" value="no")
+                  |  no
+
+              // File upload
+              label(for="notesFile") Upload Prewritten Notes
+              input(type="file" id="notesFile" name="notesFile")
+
+              // Interac email
+              label(for="interacEmail") Interac email (for coffee payments)
+              input(type="email" id="interacEmail" name="interacEmail")
+
+              // Hidden banner key (set by JS when clicking a banner)
+              input(type="hidden" id="bannerKey" name="bannerKey")
+
+              button(type="submit") Start Note Session
+
+          .create-right
+            h2 Choose a banner
+            .banner-grid
+              // Each banner has data-key we store in hidden input
+              .banner-option(data-key="ocean-1")
+                img(src="/images/banner/ocean-1.jpg" alt="Ocean 1")
+              .banner-option(data-key="cash-1")
+                img(src="/images/banner/cash-1.jpg" alt="Cash 1")
+              .banner-option(data-key="leaf-1")
+                img(src="/images/banner/leaf-1.jpg" alt="Leaf 1")
+              .banner-option(data-key="cloud-1")
+                img(src="/images/banner/cloud-1.jpg" alt="Cloud 1")
+              .banner-option(data-key="swan")
+                img(src="/images/banner/swan.jpg" alt="Swan 1")
+              .banner-option(data-key="fern")
+                img(src="/images/banner/fern.jpg" alt="Fern 1")
+
+    // Inline JS to handle banner selection + menu
+    script.
+      (function() {
+        // banner selection
+        const options = document.querySelectorAll('.banner-option');
+        const bannerInput = document.getElementById('bannerKey');
+
+        options.forEach(opt => {
+          opt.addEventListener('click', () => {
+            options.forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            bannerInput.value = opt.dataset.key;
+          });
+        });
+
+        // default selection: first banner
+        if (options.length > 0) {
+          options[0].classList.add('selected');
+          bannerInput.value = options[0].dataset.key;
+        }
+
+        // hamburger menu toggle
+        const toggle = document.getElementById('menuToggle');
+        const dropdown = document.getElementById('menuDropdown');
+        if (toggle && dropdown) {
+          toggle.addEventListener('click', () => {
+            dropdown.classList.toggle('open');
+          });
+        }
+      })();

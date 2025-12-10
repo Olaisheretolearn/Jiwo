@@ -1,0 +1,291 @@
+/* GENERAL RESET FOR HOST PAGE */
+* {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'Excalifont';
+  src: url('/fonts/Excalifont-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+body {
+  margin: 0;
+  font-family: 'Ovo', serif;
+  background: #f4f4f6;
+  color: #222;
+}
+
+/* LAYOUT */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 180px;
+  border-right: 1px solid #ddd;
+  padding: 30px 20px;
+  background: #ffffff;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin-bottom: 15px;
+}
+
+.sidebar a {
+  text-decoration: none;
+  color: #000;
+}
+
+.main-content {
+  flex: 1;
+  padding: 25px 60px 40px;
+}
+
+/* TOP BAR */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.search-form input {
+  width: 400px;
+  padding: 6px 10px;
+  border: 1px solid #000;
+}
+
+.app-name {
+  margin-right: 10px;
+}
+
+.hamburger-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.hamburger-menu button {
+  border: none;
+  background: #3f4a6a;
+  color: white;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 32px;
+  list-style: none;
+  padding: 6px 0;
+  margin: 0;
+  background: white;
+  border: 1px solid #ccc;
+  display: none;
+}
+
+.menu-dropdown.open {
+  display: block;
+}
+
+.menu-dropdown li {
+  padding: 6px 16px;
+}
+
+.menu-dropdown button {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* SESSION TOOLBAR */
+.session-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: #3f4a6a;
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.format-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.format-buttons button {
+  border: none;
+  background: white;
+  color: #3f4a6a;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.format-buttons button:hover {
+  background: #e3e3e3;
+}
+
+.session-status {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.toggle input {
+  margin-right: 6px;
+}
+
+#endSession {
+  border: none;
+  background: #22283a;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* MAIN LAYOUT: EDITOR + COMMENTS */
+.host-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 25px;
+}
+
+/* NOTE EDITOR */
+.note-editor {
+  background: #fafafa;
+  padding: 20px 22px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.note-editor h1 {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.note-editor textarea {
+      font-family: 'Excalifont', serif;
+  width: 100%;
+  min-height: 360px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 15px;
+  resize: vertical;
+}
+
+.note-editor button {
+  margin-top: 14px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: #3f4a6a;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* COMMENTS PANEL */
+.comments-panel {
+  background: #f9f9f9;
+  padding: 18px 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  height: fit-content;
+}
+
+.comments-panel h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.comment-line {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.comments-panel form {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.comments-panel input[type="text"] {
+  flex: 1;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #aaa;
+}
+
+.comments-panel button {
+  padding: 8px 16px;
+  border: none;
+  background: #3f4a6a;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.share-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f1f2f6;
+  padding: 8px 14px;
+  border-radius: 4px;
+  margin: 10px 0 18px;
+  font-size: 13px;
+}
+
+.share-code,
+.share-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.share-label {
+  font-weight: 600;
+}
+
+.code-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #3f4a6a;
+  color: #fff;
+  font-size: 12px;
+}
+
+#sessionLink {
+  width: 260px;
+  padding: 4px 8px;
+  border: 1px solid #aaa;
+  font-size: 12px;
+}
+
+#copyLink {
+  padding: 4px 10px;
+  border: none;
+  background: #3f4a6a;
+  color: #fff;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+

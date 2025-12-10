@@ -1,0 +1,151 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title #{session.classCode} – Live Notes
+    link(rel="stylesheet", href="https://fonts.googleapis.com/css2?family=Ovo&display=swap")
+   
+    link(rel="stylesheet", href="/viewer.css")
+
+  body
+    .app-container
+      aside.sidebar
+        nav
+          ul
+            li: a(href="/dashboard") Home
+            li: a(href="/downloads") Downloads
+
+      // MAIN AREA
+      .main-content
+        // TOP BAR
+        header.top-bar
+          .top-left
+            h2 Hi #{username}
+          .top-center
+            form.search-form(action="/search" method="GET")
+              input(type="text" name="q" placeholder="Search")
+          .top-right
+            span.app-name Jiwo
+            .hamburger-menu
+              button(type="button" id="menuToggle") ☰
+              ul#menuDropdown.menu-dropdown
+                li
+                  form(action="/logout" method="POST")
+                    button(type="submit") Log out
+
+        // BLUE SESSION HEADER BAR
+        .viewer-toolbar
+          .class-info
+            span.class-pill #{session.classCode} – #{session.description}
+            span.host-pill Host session
+            button.btn-small.buy-coffee(type="button" data-email-session.interacEmail) Buy Host Coffee
+          .session-meta
+            span.meta-item
+              | 👁 #{session.viewerCount || 0}
+            span.meta-item
+              if session.isLive
+                span.live-badge ● LIVE
+              else
+                span.notlive-badge • Not live
+            a.leave-btn(href="/dashboard") Leave Session
+
+        // MAIN CONTENT + COMMENTS
+        .viewer-layout
+          .note-viewer
+            h1.note-title #{session.classCode} – #{session.description}
+            .note-card
+              pre.note-text!= session.noteText
+
+            .viewer-actions
+              form(action=`/sessions/${session._id}/clap` method="POST")
+                button(type="submit").primary-btn
+                  | 👏 Send Claps
+                
+              a.download-btn(href=`/sessions/${session._id}/download`)
+                | ⬇ Download Notes 
+
+          .comments-panel
+            h3 Live note Comments
+            .comments-list
+            if session.comments && session.comments.length
+              each c in session.comments
+                p.comment-line
+                  span.comment-time= c.createdAt.toLocaleString()
+                  |  – #{c.authorName}: #{c.text}
+            else
+              p No comments yet.
+
+            form(action=`/sessions/${session._id}/comments` method="POST")
+              input(type="text" name="text" placeholder="Write a comment")
+              button(type="submit") Send
+
+    // ONE script block, after DOM
+    script.
+      (function() {
+        // hamburger menu
+        const menuToggle = document.getElementById('menuToggle');
+        const menuDropdown = document.getElementById('menuDropdown');
+        if (menuToggle && menuDropdown) {
+          menuToggle.addEventListener('click', () => {
+            menuDropdown.classList.toggle('open');
+          });
+        }
+
+  
+
+
+        //websocket for live notes 
+                const notePre = document.querySelector('.note-card pre.note-text');
+        const viewerCountSpan = document.querySelector('.viewer-toolbar .session-meta .meta-item:nth-child(1)');
+        const liveStatusSpan = document.querySelector('.session-meta .meta-item:nth-child(2)');
+
+        const sessionId = "#{session._id}";
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const wsUrl = `${wsProtocol}://${window.location.host}/ws/sessions/${sessionId}?role=viewer`;
+        const ws = new WebSocket(wsUrl);
+
+        ws.addEventListener('message', (event) => {
+          let data;
+          try {
+            data = JSON.parse(event.data);
+          } catch {
+            return;
+          }
+
+          if (data.type === 'noteUpdate' && notePre) {
+            notePre.textContent = data.text;
+          }
+
+          if (data.type === 'viewerCount' && viewerCountSpan) {
+            viewerCountSpan.textContent = `👁 ${data.viewerCount}`;
+          }
+
+          if (data.type === 'liveStatus' && liveStatusSpan) {
+            liveStatusSpan.innerHTML = data.isLive
+              ? '<span class="live-badge">● LIVE</span>'
+              : '<span class="notlive-badge">• Not live</span>';
+          }
+
+          if (data.type === 'clapCount') {
+            const clapSpan = document.querySelector('.session-meta .meta-item:nth-child(3)');
+            if (clapSpan) {
+              clapSpan.textContent = `👏 ${data.clapCount}`;
+            }
+          }
+
+           if (data.type === 'sessionEnded') {
+            alert('This note session has ended.');
+            window.location.href = '/dashboard';
+          }
+
+          if (data.type === 'newComment') {
+            appendComment(data.comment);
+          }
+        });
+
+      }
+      
+      )();
+
+      

@@ -1,0 +1,55 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Sign up – Jiwo
+
+
+    link(rel="stylesheet", href="https://fonts.googleapis.com/css2?family=Ovo&display=swap")
+
+
+    link(rel="stylesheet", href="/styles.css")
+
+  body
+    .login-container
+      .left-side
+        img.login-bg(src="/images/login-bg.avif" alt="Background")
+
+      .right-side
+        h1 Welcome to Jiwo
+        p Sign up for a new account to continue
+
+        if error 
+            p.error-message #{error}
+
+        form(action="/signup" method="POST")
+          div
+            label(for="username") Name
+            input(type="text" name="username" id="username" required)
+
+          div
+            label(for="email") School Email
+            input(
+              type="email"
+              name="email"
+              id="email"
+              placeholder="@webmail.uwinnipeg.ca"
+              required
+            )
+
+          div
+            label(for="password") Password
+            input(type="password" name="password" id="password" required)
+
+          button(type="submit") Sign up
+
+        p.register-text
+          | Already have an account?
+          a(href="/login")  Login
+
+        p.terms-text
+          | By signing up , you agree to our 
+          a(href="#") Terms of Service 
+          |  and 
+          a(href="#") Privacy Policy
